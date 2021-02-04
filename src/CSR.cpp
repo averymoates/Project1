@@ -13,6 +13,7 @@ protected:
 	int n; //The number of rows of the original matrix
 	int m; // The number of columns of the original matrix.
 	int nonZeros; //The number of non-zeros in the original matrix.
+	int currentValueIndex;
 	int* values; //Value array assuming all are integers.
 	int* rowPtr; //Array that contains number of non-zero elements in each row of the original matrix.
 	int* colPos; //Array that contains the column number from the original matrix for the non-zero values
@@ -86,15 +87,8 @@ void CSR::addColumn(int col){
 }
 
 void CSR::addRow(int row){
-	int valueIndex = -1;
-	for(int i=0; i<nonZeros; ++i){
-		if(values[i] == -1){
-			valueIndex = i;
-			break;
-		}
-	}
 	if(rowPtr[row] == -1){
-		rowPtr[row] = valueIndex - 1;
+		rowPtr[row] = currentValueIndex;
 	}
 
 
@@ -108,6 +102,7 @@ void CSR::addValue(int value){
 			}
 		}
 		values[currentIndex] = value;
+		currentValueIndex = currentIndex;
 
 }
 
@@ -164,7 +159,7 @@ CSR::~CSR(){
 int main(){
 
 	CSR* A;
-	//CSR* B;
+	CSR* B;
 	//int* aVector;
 	int numRows, numColumns, numNonZeros;
 	int row, col, value;
@@ -190,7 +185,18 @@ int main(){
 	//TODO
 	//Read in the second matrix which is similar to the first into the CSR pointer object B and display
 
-	//(*B).display();
+	cin >> numRows >> numColumns;
+	cin >> numNonZeros;
+
+	B = new CSR(numRows, numColumns, numNonZeros);
+
+	for(int i=0; i<numNonZeros; ++i){
+		cin >> row >> col >> value;
+		(*B).addValue(value);
+		(*B).addRow(row);
+		(*B).addColumn(col);
+	}
+	(*B).display();
 
 	//Read in the vector
 	//cin >> numColumns;
