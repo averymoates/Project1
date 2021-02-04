@@ -45,13 +45,68 @@ CSR::CSR(){
 	colPos = NULL;
 }
 
+CSR::CSR(CSR& matrixB){
+	//TODO
+}
+
 CSR::CSR(int rows, int cols, int numNonZeros){
 	n = rows;
 	m = cols;
 	nonZeros = numNonZeros;
 	values = new int[nonZeros];
+	//setting all values in the array to negative values
+	for(int i=0; i<nonZeros; ++i){
+					values[i] = -1;
+				}
 	colPos = new int[nonZeros];
+	//setting all values in the array to negative values
+	for(int i=0; i<nonZeros; ++i){
+				colPos[i] = -1;
+			}
 	rowPtr = new int[n];
+	//setting all values in the array to negative values
+	for(int i=0; i<n; ++i){
+					rowPtr[i] = -1;
+				}
+}
+
+int CSR::getNumRows(){
+	//TODO
+}
+
+void CSR::addColumn(int col){
+	int currentIndex = -1;
+	for(int i=0; i<nonZeros; ++i){
+		if(colPos[i]==-1 && currentIndex==-1){
+			currentIndex = i;
+		}
+	}
+	colPos[currentIndex] = col;
+}
+
+void CSR::addRow(int row){
+	int currentIndex = -1;
+	for(int i=0; i<n; ++i){
+		if(rowPtr[i]==-1 && currentIndex == -1){
+			currentIndex = i;
+		}
+	}
+	rowPtr[currentIndex] = row;
+}
+
+void CSR::addValue(int value){
+	int currentIndex = -1;
+		for(int i=0; i<nonZeros; ++i){
+			if(values[i]==-1 && currentIndex==-1){
+				currentIndex = i;
+			}
+		}
+		values[currentIndex] = value;
+
+}
+
+void CSR::display(){
+	//TODO
 }
 
 int* CSR::matrixVectorMultiply(int* inputVector){
@@ -68,6 +123,10 @@ int* CSR::matrixVectorMultiply(int* inputVector){
 	}
 
 	return outputVector;
+}
+
+CSR* CSR::matrixMultiply(CSR& matrixB){
+
 }
 
 CSR::~CSR(){
