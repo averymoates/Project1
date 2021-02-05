@@ -32,11 +32,13 @@ public:
 	int* getColPosArray();
 	int* getValuesArray();
 	int* getRowVec(int row);
+	int* getColumnVector(int col);
 	void addValue(int value); //Adds a new value in the values array
 	void addColumn(int col); //Adds a column in the colPos array
 	void addRow(int row); //Adds a row in the rowPtr array
 	void display(); //Prints the contents of the three arrays. Each array must be on a different line and you have exactly a single space between each value printed.
 	int* matrixVectorMultiply(int* inputVector); //Matrix-vector multiplication
+	int rowByColumnMultiply(int* row, int rowSize, int* column, int columnSize);
 	CSR* matrixMultiply(CSR& matrixB); //Matrix-matrix multiplication
 	~CSR();
 
@@ -172,21 +174,60 @@ int* CSR::getRowVec(int row) {
 	return vector;
 }
 
+int* CSR::getColumnVector(int col){
+	int* colVector = new int[n];
+	int r;
+	for(int i=0; i<n; ++i){
+		colVector[i] = 0;
+	}
+
+	bool found;
+	int k,j;
+
+	k=0;
+	for(int i=0; i<n-1; ++i){
+		r = rowPtr[i+1] - rowPtr[i];
+		k = rowPtr[i];
+		found = false;
+		j = 0;
+		while((j<r) && !found){
+			if(colPos[k] == col){
+				found = true;
+				colVector[i] = values[k];
+			}
+			++k;
+			++j;
+		}
+	}
+	int p = rowPtr[n-1];
+	found = false;
+	while((p < (nonZeros))&&(!found)){
+		if(colPos[p] ==col){
+			colVector[n-1] = values[p];
+			found = true;
+		}
+		else{
+			++p;
+		}
+	}
+	return colVector;
+}
+
 void CSR::display(){
 	//Displaying the colPos array
-	cout << "This is the colPos array" << endl;
+	cout << "This is the colPos array :";
 	for(int i=0; i<nonZeros; ++i){
 		cout << colPos[i] << " ";
 	}
 
 	//Displaying the values array
-	cout << endl << "This is the values array" << endl;
+	cout << endl << "This is the values array :";
 	for(int i=0; i<nonZeros; ++i){
 		cout << values[i] << " ";
 	}
 
 	//Displaying the rowPtr array
-	cout << endl << "This is the rowPtr array" << endl;
+	cout << endl << "This is the rowPtr array :";
 	for(int i=0; i<n; ++i){
 		cout << rowPtr[i] << " ";
 	}
@@ -209,17 +250,61 @@ int* CSR::matrixVectorMultiply(int* inputVector){
 		outputVector[i] = 0;
 	}
 
+	int sum = 0;
+	int start, end;
 	for(int i=0; i<n; ++i){
-		for(int j=rowPtr[i]; j<rowPtr[i+1]; ++j){
-			outputVector[i] = outputVector[i] + values[j] * inputVector[colPos[j]];
+		sum = 0;
+		start = rowPtr[i];
+		if((i+1) ==n){
+			end = nonZeros;
 		}
+		else{
+			end = rowPtr[i + 1];
+		}
+
+		for(int j=start; j<end; ++j){
+			sum = sum + (values[j] * inputVector[colPos[j]]);
+		}
+		outputVector[i] = sum;
 	}
 
 	return outputVector;
 }
 
+int CSR::rowByColumnMultiply(int* row, int rowSize, int* column, int columnSize){
+	int sum = 0;
+	for(int i=0; i<rowSize; ++i){
+		sum += row[i] * column[i];
+	}
+	return sum;
+}
+
 CSR* CSR::matrixMultiply(CSR& matrixB){
-	return NULL;
+	int* row;
+	int* column;
+	int* finRow;
+	int* finValues;
+	int nonZeroCount = 0;
+	int sum = 0;
+
+	for(int i=0; i<this->getNumRows(); ++i){
+		row = this->getRowVec(i);
+		for(int j=0; j<matrixB.getNumCols(); ++j){
+			column = matrixB.getColumnVector(j);
+			sum = rowByColumnMultiply(row, this->getNumRows(), column, matrixB.getNumCols());
+		}
+		if(sum > 0){
+			++nonZeroCount;
+		}
+	}
+
+	CSR* fin = new CSR(this->getNumRows(), matrixB.getNumCols(), nonZeroCount);
+
+
+
+
+
+	return fin;
 
 }
 
@@ -240,7 +325,7 @@ int main(){
 
 	CSR* A;
 	CSR* B;
-	//int* aVector;
+	int* aVector;
 	int numRows, numColumns, numNonZeros;
 	int row, col, value;
 
@@ -277,30 +362,34 @@ int main(){
 	(*B).display();
 
 	//Read in the vector
-	//cin >> numColumns;
-	//aVector = new int[numColumns];
-	//for(int i=0; i<numColumns; ++i){
-	//	cin >> aVector[i];
-	//}
+	cin >> numColumns;
+	cout << "This is the numColumns value: " << numColumns << endl;
+	aVector = new int[numColumns];
+	cout << "This is the aVector array: ";
+	for(int i=0; i<numColumns; ++i){
+		cin >> aVector[i];
+		cout << aVector[i] << " ";
+	}
+	cout << endl;
 
 	//Matrix-Vector Multiplication
-	//int* resultVector = (*A).matrixVectorMultiply(aVector);
-	//for(int i=0; i<(*A).getNumRows(); ++i){
-	//	cout << resultVector[i] << " ";
-	//	cout << endl;
-	//}
+	int* resultVector = (*A).matrixVectorMultiply(aVector);
+	for(int i=0; i<(*A).getNumRows(); ++i){
+		cout << resultVector[i] << " ";
+		cout << endl;
+	}
 
 	//Matrix-Matrix Multiplication
-	//CSR* resultMatrix = (*C).matrixMultiply(*B);
-	//(*resultMatrix).display();
+	CSR* resultMatrix = (*C).matrixMultiply(*B);
+	(*resultMatrix).display();
 
 	//Calling the destructors
-	//delete [] aVector;
-	//delete [] resultVector;
+	delete [] aVector;
+	delete [] resultVector;
 	delete A;
 	delete B;
 	delete C;
-	//delete resultMatrix;
+	delete resultMatrix;
 
 	return 0;
 
