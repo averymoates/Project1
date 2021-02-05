@@ -282,27 +282,37 @@ int CSR::rowByColumnMultiply(int* row, int rowSize, int* column, int columnSize)
 CSR* CSR::matrixMultiply(CSR& matrixB){
 	int* row;
 	int* column;
-	int* finRow;
-	int* finValues;
+	int size = this->getNumRows();
 	int nonZeroCount = 0;
 	int sum = 0;
 
-	for(int i=0; i<this->getNumRows(); ++i){
+	for(int i=0; i<size; ++i){
 		row = this->getRowVec(i);
-		for(int j=0; j<matrixB.getNumCols(); ++j){
+		for(int j=0; j<size; ++j){
 			column = matrixB.getColumnVector(j);
-			sum = rowByColumnMultiply(row, this->getNumRows(), column, matrixB.getNumCols());
+			sum = rowByColumnMultiply(row, size, column, size);
+			if(sum > 0){
+				++nonZeroCount;
+			}
 		}
-		if(sum > 0){
-			++nonZeroCount;
-		}
+
 	}
 
 	CSR* fin = new CSR(this->getNumRows(), matrixB.getNumCols(), nonZeroCount);
 
+	for(int i=0; i<size; ++i){
+		row = this->getRowVec(i);
+		for(int j=0; j<size; ++j){
+			column = matrixB.getColumnVector(j);
+			sum = rowByColumnMultiply(row, size, column, size);
+			if(sum > 0){
+				(*fin).addValue(sum);
+				(*fin).addRow(i);
+				(*fin).addColumn(j);
+			}
+		}
 
-
-
+	}
 
 	return fin;
 
