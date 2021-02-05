@@ -27,6 +27,10 @@ public:
 	int getNumRows();
 	int getNumCols();
 	int getNumNonZeros();
+	int* copyArray(int* array, int size);
+	int* getRowPtrArray();
+	int* getColPosArray();
+	int* getValuesArray();
 	int* getRowVec(int row);
 	void addValue(int value); //Adds a new value in the values array
 	void addColumn(int col); //Adds a column in the colPos array
@@ -54,23 +58,10 @@ CSR::CSR(){
 CSR::CSR(CSR& matrixB){
 	n = matrixB.getNumRows();
 	m = matrixB.getNumCols();
-	currentValueIndex = -1;
 	nonZeros = matrixB.getNumNonZeros();
-	values = new int[nonZeros];
-	//setting all values in the array to negative values
-	for(int i=0; i<nonZeros; ++i){
-		values[i] = -1;
-	}
-	colPos = new int[nonZeros];
-	//setting all values in the array to negative values
-	for(int i=0; i<nonZeros; ++i){
-		colPos[i] = -1;
-	}
-	rowPtr = new int[n];
-	//setting all values in the array to negative values
-	for(int i=0; i<n; ++i){
-		rowPtr[i] = -1;
-	}
+	rowPtr = matrixB.getRowPtrArray();
+	colPos = matrixB.getColPosArray();
+	values = matrixB.getValuesArray();
 
 }
 
@@ -106,6 +97,30 @@ int CSR::getNumCols(){
 
 int CSR::getNumNonZeros(){
 	return nonZeros;
+}
+
+int* CSR::copyArray(int* array, int size){
+	int* copiedArray = new int[size];
+	for(int i=0; i<size; ++i){
+		copiedArray[i] = array[i];
+	}
+	return copiedArray;
+
+}
+
+int* CSR::getRowPtrArray(){
+	int* copiedArray = this->copyArray(rowPtr, n);
+	return copiedArray;
+}
+
+int* CSR::getColPosArray(){
+	int* copiedArray = this->copyArray(colPos, nonZeros);
+	return copiedArray;
+}
+
+int* CSR::getValuesArray(){
+	int* copiedArray = this->copyArray(values, nonZeros);
+	return copiedArray;
 }
 
 void CSR::addColumn(int col){
@@ -284,7 +299,7 @@ int main(){
 	//delete [] resultVector;
 	delete A;
 	delete B;
-	//delete C;
+	delete C;
 	//delete resultMatrix;
 
 	return 0;
