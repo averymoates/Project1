@@ -141,6 +141,7 @@ void CSR::addRow(int row){
 	}
 
 
+
 }
 
 void CSR::addValue(int value){
@@ -157,20 +158,45 @@ void CSR::addValue(int value){
 
 int* CSR::getRowVec(int row) {
 	int *vector = new int[n];
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++){
 		vector[i] = 0;
-	if (row < n - 1) {
-		for (int i = rowPtr[row]; i < rowPtr[row + 1]; i++) {
-			for (int j = 0; j < m; j++) {
-				if (colPos[i] == j)vector[j] = values[i];
-			}
-		}
-	} else {for (int i = rowPtr[row]; i < nonZeros; i++) {
-		for (int j = 0; j < m; j++) {
-			if (colPos[i] == j)vector[j] = values[i];
+	}
+
+	int start = 0;
+	int end = -1;
+
+	if((row-1)==-1){
+		start = 0;
+		end = rowPtr[row+1];
+	}
+	else if((row+1)>=n){
+		start = rowPtr[row];
+		end = nonZeros;
+	}
+	else{
+		start = rowPtr[row];
+		end = rowPtr[row+1];
+	}
+
+	if(end!=-1){
+		for(int i=start; i<end; ++i){
+			vector[colPos[i]]=values[i];
 		}
 	}
-	}
+
+//	if (row < n - 1) {
+//		for (int i = rowPtr[row]; i < rowPtr[row + 1]; i++) {
+//			for (int j = 0; j < m; j++) {
+//				if (colPos[i] == j)vector[j] = values[i];
+//			}
+//		}
+//	} else {
+//		for (int i = rowPtr[row]; i < nonZeros; i++) {
+//			for (int j = 0; j < m; j++) {
+//				if (colPos[i] == j)vector[j] = values[i];
+//			}
+//		}
+//	}
 	return vector;
 }
 
