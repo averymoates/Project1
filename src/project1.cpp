@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : Project1.cpp
+// Name        : project1.cpp
 // Author      : Avery Moates
 // Version     : 0.0.1
 // Description : Data Structures Project One.
@@ -10,40 +10,37 @@ using namespace std;
 
 class CSR {
 protected:
-	int n; //The number of rows of the original matrix
+	int n; //The number of rows of the original matrix.
 	int m; // The number of columns of the original matrix.
 	int nonZeros; //The number of non-zeros in the original matrix.
-	int currentValueIndex;
+	int currentValueIndex; //The current index that the value was placed into.
 	int* values; //Value array assuming all are integers.
 	int* rowPtr; //Array that contains number of non-zero elements in each row of the original matrix.
-	int* colPos; //Array that contains the column number from the original matrix for the non-zero values
-
-	//There may be other variables you may need.
+	int* colPos; //Array that contains the column number from the original matrix for the non-zero values.
 
 public:
-	CSR(); //Default or empty constructor
-	CSR(CSR& matrixB); //Copy constructor
-	CSR(int rows, int cols, int numNonZeros);
-	int getNumRows();
-	int getNumCols();
-	int getNumNonZeros();
-	int* copyArray(int* array, int size);
-	int* getRowPtrArray();
-	int* getColPosArray();
-	int* getValuesArray();
-	int* getRowVec(int row);
-	int* getColumnVector(int col);
-	void addValue(int value); //Adds a new value in the values array
-	void addColumn(int col); //Adds a column in the colPos array
-	void addRow(int row); //Adds a row in the rowPtr array
+	CSR(); //Default or empty constructor.
+	CSR(CSR& matrixB); //Copy constructor.
+	CSR(int rows, int cols, int numNonZeros); //Constructs a CSR with the given dimensions and number of non-zeros.
+	int getNumRows(); //Function to return the number of rows value.
+	int getNumCols(); //Function to return the number of columns value.
+	int getNumNonZeros(); //Function to return the number of non-zeros.
+	int* getRowPtrArray(); //Function to get a copy of the rowPtr array.
+	int* getColPosArray(); //Function to get a copy of the colPos array.
+	int* getValuesArray(); //Function to get a copy of the values array.
+	int* getRowVec(int row); //Function to return every value in the specified row including zeros.
+	int* getColumnVector(int col); //Function to return every value in the specified column including zeros.
+	void addValue(int value); //Adds a new value in the values array.
+	void addColumn(int col); //Adds a column in the colPos array.
+	void addRow(int row); //Adds a row in the rowPtr array.
 	void display(); //Prints the contents of the three arrays. Each array must be on a different line and you have exactly a single space between each value printed.
-	int* matrixVectorMultiply(int* inputVector); //Matrix-vector multiplication
-	int rowByColumnMultiply(int* row, int rowSize, int* column, int columnSize);
-	CSR* matrixMultiply(CSR& matrixB); //Matrix-matrix multiplication
-	~CSR();
+	int* matrixVectorMultiply(int* inputVector); //Matrix-vector multiplication.
+	CSR* matrixMultiply(CSR& matrixB); //Matrix-matrix multiplication.
+	~CSR(); //Deconstructor functions.
 
-	//There may be other functions
-
+private:
+	int* copyArray(int* array, int size); //Helper function to make a copy of an array with a given array and size.
+	int rowByColumnMultiply(int* row, int rowSize, int* column, int columnSize); //Helper function to handle the row by column multiplication for a matrix times another matrix. This function returns a int value.
 };
 
 //Some of the functions - Sridhar Radhakrishnan
@@ -170,7 +167,7 @@ void CSR::addValue(int value){
 
 }
 
-//Function to return very value in the specified row including zeros.
+//Function to return every value in the specified row including zeros.
 int* CSR::getRowVec(int row) {
 	int *vector = new int[n];
 	for (int i = 0; i < n; i++){
@@ -202,7 +199,7 @@ int* CSR::getRowVec(int row) {
 	return vector;
 }
 
-//Function to return very value in the specified column including zeros.
+//Function to return every value in the specified column including zeros.
 int* CSR::getColumnVector(int col){
 	int* colVector = new int[n];
 	int r;
@@ -369,6 +366,7 @@ CSR::~CSR(){
 
 }
 
+//Main function.
 int main(){
 
 	CSR* A;
