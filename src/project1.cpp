@@ -152,6 +152,7 @@ void CSR::addRow(int row){
 
 
 
+
 }
 
 //Function to add the given value into the values array.
@@ -169,34 +170,56 @@ void CSR::addValue(int value){
 
 //Function to return every value in the specified row including zeros.
 int* CSR::getRowVec(int row) {
+
 	int *vector = new int[n];
-	for (int i = 0; i < n; i++){
+	for (int i = 0; i < n; i++)
 		vector[i] = 0;
-	}
-
-	int start = 0;
-	int end = -1;
-
-	if((row-1)==-1){
-		start = 0;
-		end = rowPtr[row+1];
-	}
-	else if((row+1)>=n){
-		start = rowPtr[row];
-		end = nonZeros;
-	}
-	else{
-		start = rowPtr[row];
-		end = rowPtr[row+1];
-	}
-
-	if(end!=-1){
-		for(int i=start; i<end; ++i){
-			vector[colPos[i]]=values[i];
+	if (row < n - 1) {
+		for (int i = rowPtr[row]; i < rowPtr[row + 1]; i++) {
+			for (int j = 0; j < m; j++) {
+				if (colPos[i] == j)
+					vector[j] = values[i];
+			}
 		}
 	}
-
+	else {
+		for (int i = rowPtr[row]; i < nonZeros; i++) {
+			for (int j = 0; j < m; j++) {
+				if (colPos[i] == j)
+					vector[j] = values[i];
+			}
+		}
+	}
 	return vector;
+
+//	int* fullRow = new int[n];
+//	for (int i = 0; i < n; i++){
+//		fullRow[i] = 0;
+//	}
+//
+//	int start = 0;
+//	int end = -1;
+//
+//	if((row-1)==-1){
+//		start = 0;
+//		end = rowPtr[row+1];
+//	}
+//	else if((row+1)>=n){
+//		start = rowPtr[row];
+//		end = nonZeros;
+//	}
+//	else{
+//		start = rowPtr[row];
+//		end = rowPtr[row+1];
+//	}
+//
+//	if(end!=-1){
+//		for(int i=start; i<end; ++i){
+//			fullRow[colPos[i]]=values[i];
+//		}
+//	}
+//
+//	return fullRow;
 }
 
 //Function to return every value in the specified column including zeros.
@@ -242,35 +265,38 @@ int* CSR::getColumnVector(int col){
 //Function to display all the arrays and the full 2d array.
 void CSR::display(){
 
+	if(rowPtr[n-1] == -1){
+		rowPtr[n-1] = nonZeros;
+	}
+
 	//Displaying the full array
-	cout << endl;
 	for(int i=0; i<n; ++i){
+		cout << endl;
 		int* rowIndex = this->getRowVec(i);
 		for(int j=0; j<m; ++j){
 			cout << rowIndex[j] << " ";
 		}
-		cout << endl;
 	}
-	cout << endl;
+
+	//Displaying the rowPtr array
+	cout << endl << "rowPtr: ";
+	for(int i=0; i<n; ++i){
+		cout << rowPtr[i] << " ";
+
+	}
 
 	//Displaying the colPos array
-	cout << "This is the colPos array :";
+	cout << endl << "colPos: ";
 	for(int i=0; i<nonZeros; ++i){
 		cout << colPos[i] << " ";
 	}
 
 	//Displaying the values array
-	cout << endl << "This is the values array :";
+	cout << endl << "values: ";
 	for(int i=0; i<nonZeros; ++i){
 		cout << values[i] << " ";
 	}
-
-	//Displaying the rowPtr array
-	cout << endl << "This is the rowPtr array :";
-	for(int i=0; i<n; ++i){
-		cout << rowPtr[i] << " ";
-	}
-	cout << endl << endl;
+	cout << endl;
 
 }
 
@@ -388,12 +414,12 @@ int main(){
 		(*A).addColumn(col);
 	}
 
-	cout << "Matrix A: " << endl;
+	cout << "Matrix A:";
 	(*A).display();
 
 	// Calling the copy constructor.
 	CSR* C = new CSR(*A);
-	cout << "Matrix C: " << endl;
+	cout << "Copied Matrix C:";
 	(*C).display();
 
 	//Read in the second matrix which is similar to the first into the CSR pointer object B and display
@@ -408,30 +434,30 @@ int main(){
 		(*B).addRow(row);
 		(*B).addColumn(col);
 	}
-	cout << "Matrix B: " << endl;
+	cout << "Matrix B:";
 	(*B).display();
 
 	//Read in the vector
 	cin >> numColumns;
 	//cout << "This is the numColumns value: " << numColumns << endl;
 	aVector = new int[numColumns];
-	cout << "This is the aVector array: ";
+	cout << "Vector: " << endl;
 	for(int i=0; i<numColumns; ++i){
 		cin >> aVector[i];
 		cout << aVector[i] << " ";
 	}
 	cout << endl;
 
+	cout << "A*vector: " << endl;
 	//Matrix-Vector Multiplication
 	int* resultVector = (*A).matrixVectorMultiply(aVector);
 	for(int i=0; i<(*A).getNumRows(); ++i){
 		cout << resultVector[i] << " ";
-		cout << endl;
 	}
 
 	//Matrix-Matrix Multiplication
 	CSR* resultMatrix = (*C).matrixMultiply(*B);
-	cout << "Matrix C time Matrix B:" << endl;
+	cout << endl << "A*B: ";
 	(*resultMatrix).display();
 
 	//Calling the destructors
