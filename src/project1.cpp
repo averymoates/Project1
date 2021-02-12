@@ -265,8 +265,17 @@ int* CSR::getColumnVector(int col){
 //Function to display all the arrays and the full 2d array.
 void CSR::display(){
 
-	if(rowPtr[n-1] == -1){
-		rowPtr[n-1] = nonZeros;
+
+	for(int i=0; i<n; ++i){
+		if(rowPtr[i]==-1){
+			int catcher = n;
+			for(int j=i; j<n; ++j){
+				if(rowPtr[j]>-1){
+					catcher = n;
+				}
+			}
+			rowPtr[i] = catcher;
+		}
 	}
 
 	//Displaying the full array
